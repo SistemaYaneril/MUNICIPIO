@@ -71,7 +71,7 @@ def add_metadata(auth, value, metadata, library, url_site, repository):
             'IF-MATCH': '*',
             "prefer": "return=representation"
         }
-        print(headers)
+
         data = {
             '__metadata': {'type': f"SP.Data.{library}Item"}
         }
