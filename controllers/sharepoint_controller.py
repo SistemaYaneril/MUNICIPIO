@@ -1,6 +1,5 @@
 import requests
 import os
-from flask import jsonify, request
 from requests_ntlm import HttpNtlmAuth
 
 def authentication(dominio_usuario, contrasena):
