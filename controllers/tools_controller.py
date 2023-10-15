@@ -1,6 +1,6 @@
 import io
 from flask import request, jsonify, send_file
-from PyPDF4 import PdfFileMerger
+from PyPDF2 import PdfFileMerger
 
 def merge_pdf():
     try:
