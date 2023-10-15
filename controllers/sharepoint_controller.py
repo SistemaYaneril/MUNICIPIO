@@ -7,9 +7,9 @@ def authentication(dominio_usuario, contrasena):
     try:
         result_loggin = HttpNtlmAuth(dominio_usuario, contrasena)
 
-        return jsonify({ "status": True, "message": result_loggin}), 200
+        return { "status": True, "message": result_loggin}
     except:
-        return jsonify({ "status": False, "message": "Usuario - contraseña incorrecto"}), 400
+        return { "status": False, "message": "Usuario - contraseña incorrecto"}
     
 def authentication_sites(auth, url_domain):
     try:
@@ -23,11 +23,11 @@ def authentication_sites(auth, url_domain):
 
         digest_value = response.json().get('d').get('GetContextWebInformation').get('FormDigestValue')
 
-        return jsonify({ "status": True, "message": digest_value}), 200
+        return { "status": True, "message": digest_value}
     except:
-        return jsonify({ "status": False, "message": f"Sitio '{url_domain}' no disponible"}), 400
+        return { "status": False, "message": f"Sitio '{url_domain}' no disponible"}
 
-def upload_file_site(auth, value, url_site, file_name, librery):
+def upload_file_site(auth, value, url_site, url_file, file_name, librery):
     try:
         upload_url = f"{url_site}/_api/web/GetFolderByServerRelativeUrl('{librery}')/Files/add(url='{file_name}',overwrite=true)"
         
@@ -37,7 +37,7 @@ def upload_file_site(auth, value, url_site, file_name, librery):
             'X-RequestDigest': value
         }
         
-        response_file = requests.get(request.json["url_documents"]); 
+        response_file = requests.get(url_file); 
 
         with open(file_name, "wb") as f:
                 f.write(response_file.content)
@@ -53,16 +53,16 @@ def upload_file_site(auth, value, url_site, file_name, librery):
             
             file_link = response.json()['d']['ServerRelativeUrl']
 
-            return jsonify({'status': True, 'message': file_link}), 200
+            return {'status': True, 'message': file_link}
                 
-        return jsonify({'status': False, 'message': 'Archivo no se pudo ser subido'}), 400
+        return {'status': False, 'message': 'Archivo no se pudo ser subido'}
     except:        
-        return jsonify({ "status": False, "message": f"Error al subir archivo"}), 500
+        return { "status": False, "message": f"Error al subir archivo"}
     
 def add_metadata(auth, value, metadata, library, url_site, repository):
     try:
         update_url = f"{url_site}/_api/web/GetFileByServerRelativeUrl('{repository}')/ListItemAllFields"
-
+        
         headers = {
             'Accept': 'application/json;odata=verbose',
             'Content-Type': 'application/json;odata=verbose',
@@ -71,7 +71,7 @@ def add_metadata(auth, value, metadata, library, url_site, repository):
             'IF-MATCH': '*',
             "prefer": "return=representation"
         }
-
+        print(headers)
         data = {
             '__metadata': {'type': f"SP.Data.{library}Item"}
         }
@@ -80,10 +80,10 @@ def add_metadata(auth, value, metadata, library, url_site, repository):
 
         response = requests.post(update_url, headers=headers, json=data, auth=auth)
         
-        if response.status_code in [204]:
-            return jsonify({'status': True, 'message': 'Metadata adjuntado con éxito'}), 200
+        if response.status_code in [204, 200, 201]:
+            return {'status': True, 'message': 'Metadata adjuntado con éxito'}
                 
-        return jsonify({'status': False, 'message': 'Error al adjuntar metadata'}), 400
+        return {'status': False, 'message': 'Error al adjuntar metadata'}
 
     except:
-        return jsonify({ "status": False, "message": f"Error al adjuntar metadata"}), 500
+        return { "status": False, "message": f"Error al adjuntar metadata"}

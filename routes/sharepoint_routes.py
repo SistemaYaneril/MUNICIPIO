@@ -34,8 +34,9 @@ def upload_file():
     url_domain = request.json["url_domain"]
     metadata = request.json['metadata']
     name_file = request.json['name_file']
+    url_file = unquote(request.json['url_documents'])
 
-    dominio_usuario = f"{dominio}\\{usuario}"
+    dominio_usuario = dominio+"\\"+usuario
     
     url_decodificado = unquote(url_domain)
 
@@ -56,16 +57,16 @@ def upload_file():
     auth = authentication(dominio_usuario, contrasena)
 
     if auth['status'] == False:
-        return auth
-    
+        return jsonify(auth)
+
     digest_value = authentication_sites(auth['message'], url_domain)
 
     if digest_value['status'] == False:
-        return digest_value
-    
-    result_uploading = upload_file_site(auth['message'], digest_value['message'], url_domain, name_file, f"{lista_filtrada[-2]}/{lista_filtrada[-1]}")
+        return jsonify(digest_value)
+
+    result_uploading = upload_file_site(auth['message'], digest_value['message'], url_domain, url_file, name_file, f"{lista_filtrada[-2]}/{lista_filtrada[-1]}")
 
     if result_uploading['status'] == False:
-        return digest_value
+        return jsonify(result_uploading)
     
-    return add_metadata(auth['message'], digest_value['message'], metadata, biblioteca, url_domain)
+    return jsonify(add_metadata(auth['message'], digest_value['message'], metadata, biblioteca, url_domain, result_uploading['message']))
