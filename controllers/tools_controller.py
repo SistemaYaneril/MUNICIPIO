@@ -1,10 +1,10 @@
 import io
 from flask import request, jsonify, send_file
-from PyPDF2 import PdfFileMerger
+from PyPDF2 import PdfMerger 
 
 def merge_pdf():
     try:
-        pdf_merger = PdfFileMerger()
+        pdf_merger = PdfMerger ()
 
         if 'pdfs' not in request.files:
             return jsonify({"status": False, "message": "No se enviaron archivos PDF"}), 400
